@@ -134,3 +134,132 @@ try:
 except Exception as e:
     print(f"Erro ao obter dados: {e}")
     exit()
+
+# PLOTANDO PAINEL
+try:
+    plt.subplots(2, 2, figsize=(18, 10))
+
+    # "-----------------------------------------------------------"
+    # Boxplot
+    # "-----------------------------------------------------------"
+    plt.subplot(2, 2, 1)
+    plt.boxplot(array_roubo_veiculo, vert=False, showmeans=True)
+
+
+    # "-----------------------------------------------------------"
+    # Barras
+    # Outliers superiores ou Municípios com Menores Roubos
+    # "-----------------------------------------------------------"
+    plt.subplot(2, 2, 2)
+    if not df_roubo_veiculo_outliers_superiores.empty:
+        dados_superiores = df_roubo_veiculo_outliers_superiores.sort_values(by='roubo_veiculo', ascending=True).head(10)
+        barras = plt.barh(dados_superiores['munic'], dados_superiores['roubo_veiculo'], color='green')
+        plt.bar_label(barras, label_type='edge', fontsize=8, padding=2)
+        plt.title('Outliers Superiores')
+
+    elif len(df_roubo_veiculo_maiores) > 1:
+        dados_superiores = df_roubo_veiculo_maiores.sort_values(by='roubo_veiculo', ascending=True).head(10)
+        barras = plt.barh(dados_superiores['munic'], dados_superiores['roubo_veiculo'], color='red')
+        plt.bar_label(barras, label_type='edge', fontsize=8, padding=2)
+        plt.title('Municípios com Maiores Roubos')
+
+    else:
+        # Obtém os dados da única linha
+        if len(df_roubo_veiculo_maiores) == 1:
+            munic = df_roubo_veiculo_maiores.iloc[0]['munic']
+            roubos = df_roubo_veiculo_maiores.iloc[0]['roubo_veiculo']
+
+            # String para printar
+            texto = f"Município: {munic}\nRoubos: {roubos}"
+            
+            plt.text(0.5, 0.5, texto, ha='center', va='center', fontsize=12)
+        
+        else:
+            munic = df_regiao.iloc[0]['munic']
+            roubos = df_regiao.iloc[0]['roubo_veiculo']
+
+            # String para printar
+            texto = f"Município: {munic}\nRoubos: {roubos}"
+            
+            plt.text(0.5, 0.5, texto, ha='center', va='center', fontsize=12)
+            
+            # Desabilita os Eixos
+            plt.xticks([])
+            plt.yticks([])
+
+            plt.title('Município com Maior Roubo')
+
+    # "-----------------------------------------------------------"
+    # Colunas
+    # Outliers Iferiores ou Municípios com Menores Roubos
+    # "-----------------------------------------------------------"
+    plt.subplot(2, 2, 3)
+    if not df_roubo_veiculo_outliers_inferiores.empty:
+        dados_inferiores = df_roubo_veiculo_outliers_inferiores.sort_values(by='roubo_veiculo', ascending=False).head(10)
+        colunas = plt.bar(dados_inferiores['munic'], dados_inferiores['roubo_veiculo'], color='gray')
+        plt.bar_label(colunas, label_type='edge', fontsize=8, padding=2)
+        # Remove os eixos originais
+        plt.xticks([])
+
+        for i, nome in enumerate(dados_inferiores['munic']):
+            deslocamento = 0.7
+            plt.text(i, deslocamento, nome, rotation=90, ha='center', va='bottom', fontsize=8, color='black')
+        plt.title('Outliers Inferiores')
+
+    elif len(df_roubo_veiculo_menores) > 1:
+        dados_inferiores = df_roubo_veiculo_menores.sort_values(by='roubo_veiculo', ascending=True).head(10)
+        colunas = plt.bar(dados_inferiores['munic'], dados_inferiores['roubo_veiculo'], color='gray')
+        plt.bar_label(colunas, label_type='edge', fontsize=8, padding=2)
+        # Remove os eixos originais
+        plt.xticks([])
+
+        for i, nome in enumerate(dados_inferiores['munic']):
+            deslocamento = 0.7
+            plt.text(i, deslocamento, nome, rotation=90, ha='center', va='bottom', fontsize=8, color='black')
+        plt.title('Municípios com Menores Roubos')
+
+    else:
+        # Gráfico de colunas com todos os municípios
+        df_municipios = df_regiao.sort_values(by='roubo_veiculo', ascending=False)
+        colunas = plt.bar(df_municipios['munic'], df_municipios['roubo_veiculo'], color='gray')
+        plt.bar_label(colunas, label_type='edge', fontsize=8, padding=2)
+        # Remove os eixos originais
+        plt.xticks([])
+
+        for i, nome in enumerate(df_municipios['munic']):
+            deslocamento = 0.7
+            plt.text(i, deslocamento, nome, rotation=90, ha='center', va='bottom', fontsize=8, color='black')
+        plt.title('Todos os Municípios')
+
+    # "-----------------------------------------------------------"
+    # Medidas
+    # "-----------------------------------------------------------"
+    plt.subplot(2, 2, 4)
+    plt.title('Medidas Estatísticas')
+    plt.text(0.1, 0.9, f'Limite inferior: {limite_inferior}', fontsize=10)
+    plt.text(0.1, 0.8, f'Menor valor: {minimo}', fontsize=10) 
+    plt.text(0.1, 0.7, f'Q1: {q1}', fontsize=10)
+    plt.text(0.1, 0.6, f'Mediana: {mediana_roubo_veiculo}', fontsize=10)
+    plt.text(0.1, 0.5, f'Q3: {q3}', fontsize=10)
+    plt.text(0.1, 0.4, f'Média: {media_roubo_veiculo:.3f}', fontsize=10)
+    plt.text(0.1, 0.3, f'Maior valor: {maximo}', fontsize=10)
+    plt.text(0.1, 0.2, f'Limite superior: {limite_superior}', fontsize=10)
+
+    plt.text(0.5, 0.9, f'Distância Média e Mediana: {distancia_media_mediana:.4f}', fontsize=10)
+    plt.text(0.5, 0.8, f'IQR: {iqr}', fontsize=10)
+    plt.text(0.5, 0.7, f'Amplitude Total: {amplitude_total}', fontsize=10)
+    plt.text(0.5, 0.6, f'Variância: {variancia:.5f}', fontsize=10)
+    plt.text(0.5, 0.5, f'Desvio Padrão: {desvio_padrao:.5f}', fontsize=10)
+    plt.text(0.5, 0.4, f'Distância Média para Variância: {distancia_variancia_media:.5f}', fontsize=10)
+    plt.text(0.5, 0.3, f'Coeficiente de Variação: {coeficiente_variacao:.5f}')
+    plt.text(0.5, 0.2, f'Assimetria: {assimetria:.5f}')
+    plt.text(0.5, 0.1, f'Curtose: {curtose:.5f}')
+    
+    plt.xticks([])
+    plt.yticks([])
+        
+    plt.tight_layout()
+    plt.show()
+
+except Exception as e:
+    print(f'Erro plotar painel: {e}')
